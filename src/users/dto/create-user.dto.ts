@@ -22,10 +22,6 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'A descrição é obrigatória.' })
-  description: string;
-
-  @IsString()
   @IsEnum(Role, { message: 'Invalid role' })
   @IsOptional()
   role: string;

@@ -7,14 +7,25 @@ export class VacancyService {
   
     constructor(private readonly prisma: PrismaService) {}
   
-     async create(createUserDto: CreateVacancyDto){
+    async create(createUserDto: CreateVacancyDto, recruiterId: number) {
           const Vacancy = this.prisma.user.create({
-              data: createUserDto
+              data: {
+                    ...createUserDto,
+                    recruiter: {
+                        connect: {
+                            id: recruiterId
+                        }
+                    }
+              }
           });
   
           return {
               message: "Vacancy created successfully",
               Vacancy
           }
-      }
+    }
+
+    async findAll() {
+        return this.prisma.vacancy.findMany();
+    }
 }

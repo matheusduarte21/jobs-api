@@ -1,34 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
 import { ApplicationsService } from './applications.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
-import { UpdateApplicationDto } from './dto/update-application.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 @Controller('applications')
 export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}
 
   @Post()
-  create(@Body() createApplicationDto: CreateApplicationDto) {
+  @UseGuards(AuthGuard('jwt'))
+  create(@Body() createApplicationDto: CreateApplicationDto, @Req() req: Request) {
+
+    if (!req.user) {
+      throw new UnauthorizedException('Usuário não autenticado');
+    }
+    const userId = req.user['sub']
+    createApplicationDto.userId = userId;
     return this.applicationsService.create(createApplicationDto);
   }
 
-  @Get()
-  findAll() {
-    return this.applicationsService.findAll();
-  }
+  @Get('my-applications')
+  @UseGuards(AuthGuard('jwt'))
+  findAllMyApplication(@Req() req: Request) {
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.applicationsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateApplicationDto: UpdateApplicationDto) {
-    return this.applicationsService.update(+id, updateApplicationDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.applicationsService.remove(+id);
+    if (!req.user) {
+      throw new UnauthorizedException('Usuário não autenticado');
+    }
+    const userId = req.user['sub']
+    return this.applicationsService.findAllMyApplication(userId);
   }
 }
