@@ -1,12 +1,11 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 enum Role {
   RECRUITER
-  CANDIDATE
+  FREELANCER
 }
 
 enum ApplicationStatus {
@@ -28,26 +27,33 @@ model User {
   lastName  String
   email     String  @unique
   password  String
-  role       Role      @default(CANDIDATE)
+  role       Role      @default(FREELANCER)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   profile  Profile? 
   applications Application[]
   vacancies    Vacancy[] @relation("PostedVacancies")
 }
 
+model Company {
+  id       Int       @id @default(autoincrement())
+  name     String
+  vacancies Vacancy[] // relação inversa
+}
+
 model Vacancy {
   id          Int         @id @default(autoincrement())
   title       String
   description String
-  company     String
+  companyId   Int         // Agora, este campo se torna uma chave estrangeira para a empresa
   createdAt   DateTime    @default(now())
 
   recruiter   User        @relation("PostedVacancies", fields: [recruiterId], references: [id])
   recruiterId Int
 
+  company     Company     @relation(fields: [companyId], references: [id]) 
   applications Application[]
+
 }
 
 model Application {

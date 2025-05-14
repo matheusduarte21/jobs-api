@@ -21,7 +21,7 @@ export class ApplicationsService {
       throw new BadRequestException('Você já se candidatou a essa vaga');
     }
     
-    const newApplication = this.prisma.application.create({
+    const newApplication = await this.prisma.application.create({
       data: createApplicationDto
     });
 

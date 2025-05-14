@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+enum Role {
+  RECRUITER
+  FREELANCER
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  APPROVED
+  REJECTED
+  HIRED
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  lastName  String
+  email     String   @unique
+  password  String
+  role      Role     @default(FREELANCER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile      Profile?
+  applications Application[]
+  vacancies    Vacancy[]     @relation("PostedVacancies")
+}
+
+model Vacancy {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  company     String
+  createdAt   DateTime @default(now())
+
+  recruiter   User @relation("PostedVacancies", fields: [recruiterId], references: [id])
+  recruiterId Int
+
+  applications Application[]
+}
+
+model Application {
+  id        Int               @id @default(autoincrement())
+  userId    Int
+  vacancyId Int
+  status    ApplicationStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  vacancy Vacancy @relation(fields: [vacancyId], references: [id])
+}
+
+model Profile {
+  id              Int      @id @default(autoincrement())
+  bio             String?
+  experienceYears Int?
+  currentPosition String?
+  desiredPosition String?
+  skills          String[]
+  education       String?
+  languages       String[]
+  location        String?
+  linkedinUrl     String?
+  githubUrl       String?
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+}

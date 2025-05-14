@@ -11,12 +11,14 @@ export class VacancyController {
   @Post()
   @UseGuards(AuthGuard('jwt'))
   create(@Body() createVacancyDto: CreateVacancyDto, @Req() req: Request) {
-
     if (!req.user) {
       throw new Error('Usuário não autenticado');
     }
-    const userId = req.user['sub'];
-    return this.vacancyService.create(createVacancyDto,userId );
+    
+    const recruiterId = req.user['sub'];
+    const companyId = createVacancyDto.companyId; 
+
+    return this.vacancyService.create(createVacancyDto, recruiterId, companyId);
   }
 
   @Get()
@@ -24,5 +26,4 @@ export class VacancyController {
   findAll() {
     return this.vacancyService.findAll();
   }
-  
 }

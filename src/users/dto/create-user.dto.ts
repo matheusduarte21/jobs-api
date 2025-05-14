@@ -1,12 +1,10 @@
-import { IsDateString, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
-import  Role  from '@prisma/client';
-
+import { IsString, IsNotEmpty, IsEmail, MinLength, IsEnum, IsOptional } from "class-validator";
+import { Role } from '@prisma/client';
 
 export class CreateUserDto {
-
   @IsString()
   @IsNotEmpty({ message: 'O nome é obrigatório.' })
-  @MinLength(3, { message: 'O nome deve ter no minimo 3 caracteres' })
+  @MinLength(3, { message: 'O nome deve ter no mínimo 3 caracteres' })
   name: string;
 
   @IsString()
@@ -21,17 +19,7 @@ export class CreateUserDto {
   @IsEmail({}, { message: 'E-mail inválido.' })
   email: string;
 
-  @IsString()
-  @IsEnum(Role, { message: 'Invalid role' })
+  @IsEnum(Role, { message: 'Tipo de usuário inválido' })
   @IsOptional()
-  role: string;
-
-  @IsDateString()
-  @IsOptional()
-  createdAt?: Date;
-
-  @IsDateString()
-  @IsOptional()
-  updatedAt?: Date;
-
+  role?: Role; 
 }

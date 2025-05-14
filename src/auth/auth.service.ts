@@ -41,7 +41,6 @@ export class AuthService {
                 name: user.name,
                 email: user.email,
                 createdAt: user.createdAt,
-                updatedAt: user.updatedAt,
             }
         }
     }

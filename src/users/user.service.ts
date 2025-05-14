@@ -5,24 +5,36 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-    
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-    async create(createUserDto: CreateUserDto){
+  async create(createUserDto: CreateUserDto) {
+    const saltOrRounds = 10;
+    const hashedPassword = await bcrypt.hash(createUserDto.password, saltOrRounds);
 
-        const saltOrRounds = 10;
-        const hashedPassword = await bcrypt.hash(createUserDto.password, saltOrRounds);
+    const userData = {
+      name: createUserDto.name,
+      lastName: createUserDto.lastName,
+      email: createUserDto.email,
+      password: hashedPassword,
+    };
 
-        const newUser = this.prisma.user.create({
-            data: {
-                ...createUserDto,
-                password: hashedPassword
-            }
-        });
-
-        return {
-            message: "User created successfully",
-            newUser
-        }
+    if (createUserDto.role) {
+      userData['role'] = createUserDto.role;
     }
+
+    const newUser = await this.prisma.user.create({
+      data: userData
+    });
+
+    return {
+      message: "Usuário criado com sucesso",
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        lastName: newUser.lastName,
+        email: newUser.email,
+        role: newUser.role
+      }
+    };
+  }
 }

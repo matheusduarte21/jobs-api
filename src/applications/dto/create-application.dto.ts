@@ -12,8 +12,5 @@ export class CreateApplicationDto {
 
   @IsString()
   @IsOptional()
-  @IsEnum(ApplicationStatus, { 
-    message: `O status deve ser um dos: ${Object.values(ApplicationStatus).join(', ')}`
-  })
-  status: string;
+  status: any;
 }
